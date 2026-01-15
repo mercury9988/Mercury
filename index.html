@@ -10,9 +10,6 @@
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
 </head>
 <body>
-
-<script src="offers.js"></script>
-    
     <!-- Боковое меню -->
     <div class="sidebar">
         <div class="logo-container">
@@ -56,22 +53,17 @@
     <main class="main-content">
         <!-- Вкладка Главная -->
         <section id="home" class="tab-content active">
-            <div class="balance-dual">
-    <div class="balance-card neon-glow-1">
-        <div class="balance-label">
-            <i class="fas fa-wallet"></i>
-            Баланс
-        </div>
-        <div class="balance-value" id="balance">0 ₽</div>
-    </div>
-    <div class="balance-card neon-glow-3">
-        <div class="balance-label">
-            <i class="fas fa-clock"></i>
-            Холд
-        </div>
-        <div class="balance-value hold-value" id="holdBalance">0 ₽</div>
-    </div>
-</div>
+            <div class="balance-container">
+                <div class="balance-card neon-glow">
+                    <h2>Ваш баланс</h2>
+                    <div class="balance-amount">
+                        <span class="amount" id="balance">1 850 ₽</span>
+                        <div class="hold-balance">
+                            <span>Холд:</span>
+                            <span class="hold-amount" id="holdBalance">750 ₽</span>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="warning-banner neon-border">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -528,31 +520,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-<!-- Добавьте эти элементы в body перед закрывающим тегом -->
-
-<!-- Кнопка назад (только для мобильных) -->
-<button class="back-button" id="backButton">
-    <i class="fas fa-arrow-left"></i>
-    Назад
-</button>
-
-<!-- Нижняя панель навигации -->
-<div class="bottom-nav">
-    <a href="#" class="bottom-nav-item active" data-tab="home">
-        <i class="fas fa-home"></i>
-        <span>Главная</span>
-    </a>
-    <a href="#" class="bottom-nav-item" data-tab="earnings">
-        <i class="fas fa-money-bill-wave"></i>
-        <span>Заработок</span>
-    </a>
-    <a href="#" class="bottom-nav-item" data-tab="support">
-        <i class="fas fa-headset"></i>
-        <span>Поддержка</span>
-    </a>
-    <a href="#" class="bottom-nav-item" data-tab="menu">
-        <i class="fas fa-bars"></i>
-        <span>Меню</span>
-    </a>
-</div>
