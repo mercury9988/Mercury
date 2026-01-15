@@ -1,414 +1,354 @@
-// Инициализация Telegram WebApp
-let tg = null;
-let user = null;
+// Конфигурация API
+const API_BASE_URL = 'http://localhost:3000/api'; // Замените на ваш сервер
+
+// Глобальные переменные
+let currentUser = null;
+let transactionHistory = [];
 
 // Инициализация приложения
-document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем, запущено ли приложение в Telegram
-    if (typeof window.Telegram !== 'undefined') {
-        tg = window.Telegram.WebApp;
-        
-        // Настройки WebApp
-        tg.expand(); // Полноэкранный режим
-        tg.enableClosingConfirmation(); // Подтверждение закрытия
-        tg.setHeaderColor('#0a0a14');
-        tg.setBackgroundColor('#0a0a14');
-        
-        // Получаем данные пользователя
-        user = tg.initDataUnsafe.user;
-        initUserData();
-    } else {
-        // Для локального тестирования
-        user = {
-            id: 123456789,
-            first_name: 'Тестовый',
-            last_name: 'Пользователь',
-            username: 'test_user'
-        };
-        initUserData();
-        console.log('Приложение запущено вне Telegram. Включён тестовый режим.');
+async function initApp() {
+    // Проверка на Telegram
+    if (typeof window.Telegram === 'undefined') {
+        showError('Пожалуйста, откройте приложение через Telegram бота.');
+        return;
     }
     
-    // Инициализация компонентов
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+    tg.enableClosingConfirmation();
+    
+    // Получаем данные пользователя
+    const userData = tg.initDataUnsafe.user;
+    if (!userData) {
+        showError('Не удалось получить данные пользователя');
+        return;
+    }
+    
+    // Регистрация/авторизация пользователя
+    await registerUser(userData);
+    
+    // Загрузка данных
+    await loadUserData();
+    await loadTransactionHistory();
+    await loadOffers();
+    
+    // Инициализация интерфейса
     initTabs();
     initFAQ();
     initTheme();
     initModals();
     initEventListeners();
-});
+    initMobileNavigation();
+    
+    // Анимация загрузки завершена
+    document.body.classList.add('loaded');
+}
 
-// Инициализация данных пользователя
-function initUserData() {
-    if (user) {
-        const userId = user.id || '123456789';
-        const userName = user.first_name || 'Пользователь';
+// Регистрация пользователя
+async function registerUser(userData) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                telegramId: userData.id.toString(),
+                username: userData.username,
+                firstName: userData.first_name,
+                lastName: userData.last_name
+            })
+        });
         
-        document.getElementById('userId').textContent = `ID: ${userId}`;
-        document.getElementById('menuUserId').textContent = `ID: ${userId}`;
+        const data = await response.json();
+        currentUser = data.user;
         
-        // Обновляем аватар, если есть фото
-        if (user.photo_url) {
-            document.querySelectorAll('.user-avatar i, .profile-avatar i').forEach(icon => {
-                icon.style.display = 'none';
-                icon.parentElement.style.backgroundImage = `url(${user.photo_url})`;
-                icon.parentElement.style.backgroundSize = 'cover';
-                icon.parentElement.style.backgroundPosition = 'center';
-            });
-        }
+        // Обновляем интерфейс
+        updateUserInfo(currentUser);
+    } catch (error) {
+        console.error('Registration error:', error);
     }
 }
 
-// Инициализация вкладок
-function initTabs() {
-    const tabButtons = document.querySelectorAll('.nav-item');
-    const tabContents = document.querySelectorAll('.tab-content');
+// Загрузка данных пользователя
+async function loadUserData() {
+    if (!currentUser) return;
     
-    tabButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/user/${currentUser.telegramId}`);
+        const userData = await response.json();
+        
+        // Обновляем баланс
+        document.getElementById('balance').textContent = `${userData.balance.toLocaleString()} ₽`;
+        document.getElementById('holdBalance').textContent = `${userData.holdBalance.toLocaleString()} ₽`;
+        
+        // Обновляем в меню
+        document.getElementById('menuBalance').textContent = `${userData.balance.toLocaleString()} ₽`;
+        document.getElementById('menuHold').textContent = `${userData.holdBalance.toLocaleString()} ₽`;
+        
+        currentUser = userData;
+    } catch (error) {
+        console.error('Load user data error:', error);
+    }
+}
+
+// Загрузка истории операций
+async function loadTransactionHistory() {
+    if (!currentUser) return;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/transactions/${currentUser.telegramId}`);
+        transactionHistory = await response.json();
+        
+        // Здесь можно обновить интерфейс истории
+        updateTransactionHistoryUI();
+    } catch (error) {
+        console.error('Load transactions error:', error);
+    }
+}
+
+// Загрузка офферов с сервера
+async function loadOffers() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/offers`);
+        const offers = await response.json();
+        
+        renderOffers(offers);
+    } catch (error) {
+        console.error('Load offers error:', error);
+        // Используем локальные офферы как fallback
+        renderOffers(offersConfig);
+    }
+}
+
+// Рендеринг офферов
+function renderOffers(offers) {
+    const topOffersContainer = document.querySelector('.offers-grid');
+    const categoriesContainer = document.querySelector('.earnings-categories');
+    
+    if (!topOffersContainer || !categoriesContainer) return;
+    
+    // Рендерим топ офферы
+    topOffersContainer.innerHTML = offers.topOffers.map(offer => `
+        <div class="offer-card neon-card offer-card-with-image">
+            ${offer.image ? `<img src="${offer.image}" alt="${offer.title}" class="offer-image">` : ''}
+            <div class="offer-content">
+                <div class="offer-header">
+                    <div class="offer-icon">
+                        <i class="fas ${offer.icon}"></i>
+                    </div>
+                    <span class="offer-badge">${offer.badge}</span>
+                </div>
+                <h3>${offer.title}</h3>
+                <p class="offer-description">${offer.description || ''}</p>
+                <p class="offer-reward">${offer.reward}</p>
+                <button class="offer-btn" data-offer-id="${offer.id}">
+                    Получить
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Рендерим категории
+    categoriesContainer.innerHTML = Object.entries(offers.categories).map(([key, category]) => `
+        <div class="category-card neon-card">
+            <div class="category-header">
+                <div class="category-icon" style="background: ${category.color || 'var(--gradient-blue-purple)'}">
+                    <i class="fas ${category.icon}"></i>
+                </div>
+                <div class="category-info">
+                    <h3>${category.name}</h3>
+                    <p class="category-stats">${category.stats}</p>
+                </div>
+            </div>
+            <div class="category-offers">
+                ${category.offers.map(offer => `
+                    <div class="offer-line" data-offer-id="${offer.id}">
+                        <span>${offer.title}</span>
+                        <span class="offer-price">${offer.reward}</span>
+                    </div>
+                `).join('')}
+            </div>
+            <button class="category-btn" data-category="${key}">
+                Смотреть все (${category.offers.length})
+            </button>
+        </div>
+    `).join('');
+}
+
+// Инициализация мобильной навигации
+function initMobileNavigation() {
+    const backButton = document.getElementById('backButton');
+    const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+    
+    let tabHistory = ['home'];
+    let currentTab = 'home';
+    
+    // Обработчики для нижней навигации
+    bottomNavItems.forEach(item => {
+        item.addEventListener('click', function(e) {
             e.preventDefault();
-            
             const tabName = this.getAttribute('data-tab');
             
-            // Удаляем активный класс у всех кнопок
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            // Добавляем активный класс текущей кнопке
-            this.classList.add('active');
-            
-            // Скрываем все вкладки
-            tabContents.forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // Показываем выбранную вкладку
-            const activeTab = document.getElementById(tabName);
-            if (activeTab) {
-                activeTab.classList.add('active');
+            // Добавляем в историю
+            if (tabName !== currentTab) {
+                tabHistory.push(currentTab);
+                currentTab = tabName;
                 
-                // Отправляем событие в Telegram о просмотре страницы
-                if (tg) {
-                    tg.HapticFeedback.impactOccurred('light');
+                // Обновляем активные элементы
+                bottomNavItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Переключаем вкладку
+                switchTab(tabName);
+                
+                // Показываем кнопку назад если есть история
+                if (tabHistory.length > 1) {
+                    backButton.style.display = 'flex';
                 }
             }
         });
     });
-}
-
-// Инициализация FAQ
-function initFAQ() {
-    const faqItems = document.querySelectorAll('.faq-item');
     
-    faqItems.forEach(item => {
-        const question = item.querySelector('.faq-question');
-        
-        question.addEventListener('click', function() {
-            // Закрываем все остальные элементы
-            faqItems.forEach(otherItem => {
-                if (otherItem !== item) {
-                    otherItem.classList.remove('active');
+    // Обработчик кнопки назад
+    backButton.addEventListener('click', function() {
+        if (tabHistory.length > 1) {
+            const prevTab = tabHistory.pop();
+            currentTab = tabHistory[tabHistory.length - 1];
+            
+            // Переключаем на предыдущую вкладку
+            switchTab(currentTab);
+            
+            // Обновляем активные элементы
+            bottomNavItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-tab') === currentTab) {
+                    item.classList.add('active');
                 }
             });
             
-            // Переключаем текущий элемент
-            item.classList.toggle('active');
-            
-            // Тактильная обратная связь
-            if (tg) {
-                tg.HapticFeedback.impactOccurred('light');
+            // Скрываем кнопку если это последняя вкладка в истории
+            if (tabHistory.length <= 1) {
+                this.style.display = 'none';
             }
-        });
-    });
-}
-
-// Инициализация темы
-function initTheme() {
-    const themeSwitch = document.getElementById('themeSwitch');
-    const themeToggle = document.getElementById('toggleTheme');
-    const toggleSwitch = document.querySelector('.toggle-switch');
-    
-    // Проверяем сохранённую тему
-    const savedTheme = localStorage.getItem('mercury-theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
-    
-    // Обработчик для переключателя в сайдбаре
-    themeSwitch.addEventListener('click', function() {
-        toggleTheme();
-    });
-    
-    // Обработчик для переключателя в меню
-    if (themeToggle) {
-        themeToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            toggleTheme();
-        });
-    }
-    
-    // Обработчик для toggle switch
-    if (toggleSwitch) {
-        toggleSwitch.addEventListener('click', function(e) {
-            e.stopPropagation();
-            toggleTheme();
-        });
-    }
-    
-    function toggleTheme() {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('mercury-theme', newTheme);
-        updateThemeIcon(newTheme);
-        
-        // Тактильная обратная связь
-        if (tg) {
-            tg.HapticFeedback.impactOccurred('medium');
-        }
-    }
-    
-    function updateThemeIcon(theme) {
-        const icon = themeSwitch.querySelector('i');
-        if (theme === 'dark') {
-            icon.className = 'fas fa-moon';
-            icon.style.color = 'var(--neon-yellow)';
-        } else {
-            icon.className = 'fas fa-sun';
-            icon.style.color = 'var(--neon-yellow)';
-        }
-    }
-}
-
-// Инициализация модальных окон
-function initModals() {
-    const modals = document.querySelectorAll('.modal');
-    const closeButtons = document.querySelectorAll('.close-modal');
-    
-    // Закрытие модальных окон
-    closeButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const modal = this.closest('.modal');
-            closeModal(modal);
-        });
-    });
-    
-    // Закрытие при клике вне модального окна
-    modals.forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal(this);
-            }
-        });
-    });
-    
-    // Обработчик для кнопки "Заказать выплату"
-    document.getElementById('requestPayout')?.addEventListener('click', function() {
-        openPayoutModal();
-    });
-    
-    // Обработчик для подтверждения выплаты
-    document.getElementById('confirmPayout')?.addEventListener('click', function() {
-        processPayout();
-    });
-    
-    // Обработчики для кнопок офферов
-    document.querySelectorAll('.offer-btn, .category-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const card = this.closest('.offer-card, .category-card');
-            openOfferModal(card);
-        });
-    });
-    
-    // Обработчик для кнопки "Начать зарабатывать"
-    document.getElementById('startEarning')?.addEventListener('click', function() {
-        // Переходим на вкладку заработка
-        document.querySelector('[data-tab="earnings"]').click();
-        
-        // Тактильная обратная связь
-        if (tg) {
-            tg.HapticFeedback.impactOccurred('medium');
         }
     });
 }
 
-// Открытие модального окна с оффером
-function openOfferModal(card) {
-    const title = card.querySelector('h3')?.textContent || 'Оффер';
-    const reward = card.querySelector('.offer-reward, .offer-price')?.textContent || '0 ₽';
-    
-    document.getElementById('modalTitle').textContent = title;
-    document.getElementById('modalReward').textContent = reward;
-    
-    // Генерация описания в зависимости от типа оффера
-    let description = '';
-    if (title.includes('карт')) {
-        description = 'Оформление банковской карты с бесплатным обслуживанием и кэшбэком.';
-    } else if (title.includes('ИП') || title.includes('РКО')) {
-        description = 'Регистрация ИП и открытие расчётного счёта для бизнеса.';
-    } else if (title.includes('займ')) {
-        description = 'Оформление микрозайма на выгодных условиях.';
-    } else if (title.includes('Яндекс')) {
-        description = 'Трудоустройство курьером в Яндекс Еду с гибким графиком.';
-    } else {
-        description = 'Высокодоходное предложение от наших партнёров.';
-    }
-    
-    document.getElementById('modalDescription').textContent = description;
-    
-    const modal = document.getElementById('offerModal');
-    modal.classList.add('active');
-    
-    // Тактильная обратная связь
-    if (tg) {
-        tg.HapticFeedback.impactOccurred('medium');
-    }
-}
-
-// Открытие модального окна выплаты
-function openPayoutModal() {
-    const balance = parseFloat(document.getElementById('balance').textContent.replace(/[^\d]/g, ''));
-    const hold = parseFloat(document.getElementById('holdBalance').textContent.replace(/[^\d]/g, ''));
-    const available = balance - hold;
-    
-    document.getElementById('availablePayout').textContent = `${available.toLocaleString()} ₽`;
-    document.getElementById('payoutAmount').max = available;
-    document.getElementById('payoutAmount').value = Math.min(500, available);
-    
-    const modal = document.getElementById('payoutModal');
-    modal.classList.add('active');
-    
-    // Тактильная обратная связь
-    if (tg) {
-        tg.HapticFeedback.impactOccurred('medium');
-    }
-}
-
-// Обработка выплаты
-function processPayout() {
-    const amount = parseInt(document.getElementById('payoutAmount').value);
-    const method = document.getElementById('payoutMethod').value;
-    
-    if (amount < 500) {
-        alert('Минимальная сумма выплаты - 500 ₽');
+// Функция запроса выплаты
+async function requestPayout(amount, method) {
+    if (!currentUser) {
+        showNotification('Ошибка авторизации', 'error');
         return;
     }
     
-    // В реальном приложении здесь был бы запрос к API
-    console.log(`Запрошена выплата: ${amount} ₽, способ: ${method}`);
-    
-    // Показываем уведомление
-    if (tg) {
-        tg.showAlert(`Заявка на выплату ${amount} ₽ создана! Ожидайте зачисления в течение 24 часов.`);
-        tg.HapticFeedback.notificationOccurred('success');
-    } else {
-        alert(`Заявка на выплату ${amount} ₽ создана! Ожидайте зачисления в течение 24 часов.`);
-    }
-    
-    // Закрываем модальное окно
-    closeModal(document.getElementById('payoutModal'));
-}
-
-// Закрытие модального окна
-function closeModal(modal) {
-    modal.classList.remove('active');
-    
-    // Тактильная обратная связь
-    if (tg) {
-        tg.HapticFeedback.impactOccurred('light');
-    }
-}
-
-// Инициализация обработчиков событий
-function initEventListeners() {
-    // Кнопки в меню
-    document.getElementById('historyBtn')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        showNotification('История операций скоро будет доступна');
-    });
-    
-    document.getElementById('reviewsBtn')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        showNotification('Раздел с отзывами в разработке');
-    });
-    
-    document.getElementById('referralBtn')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        showNotification('Реферальная программа скоро будет запущена');
-    });
-    
-    // Кнопка "Перейти к офферу"
-    document.getElementById('goToOffer')?.addEventListener('click', function() {
-        const modal = document.getElementById('offerModal');
-        const title = document.getElementById('modalTitle').textContent;
+    try {
+        const response = await fetch(`${API_BASE_URL}/withdrawal/request`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                telegramId: currentUser.telegramId,
+                amount: parseInt(amount),
+                paymentMethod: method
+            })
+        });
         
-        // В реальном приложении здесь была бы ссылка на оффер
-        console.log(`Переход к офферу: ${title}`);
+        const data = await response.json();
         
-        if (tg) {
-            tg.showAlert(`Вы переходите к офферу "${title}". Заполните заявку полностью для получения вознаграждения.`);
-            tg.HapticFeedback.notificationOccurred('success');
+        if (data.success) {
+            showNotification('Заявка на вывод успешно создана!', 'success');
+            await loadUserData(); // Обновляем баланс
         } else {
-            alert(`Вы переходите к офферу "${title}". Заполните заявку полностью для получения вознаграждения.`);
+            showNotification(data.error, 'error');
         }
-        
-        closeModal(modal);
-    });
-}
-
-// Показать уведомление
-function showNotification(message) {
-    if (tg) {
-        tg.showAlert(message);
-        tg.HapticFeedback.impactOccurred('light');
-    } else {
-        alert(message);
+    } catch (error) {
+        showNotification('Ошибка соединения с сервером', 'error');
     }
 }
 
-// Имитация обновления баланса (для демонстрации)
-function simulateBalanceUpdate() {
-    setInterval(() => {
-        const balanceElement = document.getElementById('balance');
-        const holdElement = document.getElementById('holdBalance');
-        const menuBalance = document.getElementById('menuBalance');
-        const menuHold = document.getElementById('menuHold');
+// Функция завершения оффера
+async function completeOffer(offerId) {
+    if (!currentUser) return;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/offer/complete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: currentUser.telegramId,
+                offerId: offerId
+            })
+        });
         
-        // Случайное небольшое увеличение баланса
-        const currentBalance = parseFloat(balanceElement.textContent.replace(/[^\d]/g, ''));
-        const currentHold = parseFloat(holdElement.textContent.replace(/[^\d]/g, ''));
+        const data = await response.json();
         
-        // Случайное событие: либо новый заработок, либо перевод из холда
-        if (Math.random() > 0.7) {
-            const newEarning = Math.floor(Math.random() * 500) + 100;
-            const newBalance = currentBalance + newEarning;
-            
-            balanceElement.textContent = `${newBalance.toLocaleString()} ₽`;
-            menuBalance.textContent = `${newBalance.toLocaleString()} ₽`;
-            
-            // Анимация обновления
-            balanceElement.style.animation = 'glow 1s';
-            setTimeout(() => {
-                balanceElement.style.animation = '';
-            }, 1000);
+        if (data.success) {
+            showNotification(`Оффер завершен! Начислено: ${data.reward} ₽`, 'success');
+            await loadUserData(); // Обновляем баланс
         }
-        
-        if (Math.random() > 0.8 && currentHold > 0) {
-            const released = Math.floor(Math.random() * currentHold / 2);
-            const newBalance = currentBalance + released;
-            const newHold = currentHold - released;
-            
-            balanceElement.textContent = `${newBalance.toLocaleString()} ₽`;
-            holdElement.textContent = `${newHold.toLocaleString()} ₽`;
-            menuBalance.textContent = `${newBalance.toLocaleString()} ₽`;
-            menuHold.textContent = `${newHold.toLocaleString()} ₽`;
-        }
-    }, 10000); // Обновление каждые 10 секунд
+    } catch (error) {
+        console.error('Complete offer error:', error);
+    }
 }
 
-// Запускаем симуляцию обновления баланса через 5 секунд после загрузки
-setTimeout(simulateBalanceUpdate, 5000);
+// Уведомления
+function showNotification(message, type = 'info') {
+    // Создаем элемент уведомления
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+        <span>${message}</span>
+    `;
+    
+    // Добавляем в DOM
+    document.body.appendChild(notification);
+    
+    // Анимация появления
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Автоматическое скрытие
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
 
-// Обработка закрытия приложения
-window.addEventListener('beforeunload', function() {
-    if (tg) {
-        tg.close();
-    }
-});
+// Обновление истории транзакций в интерфейсе
+function updateTransactionHistoryUI() {
+    const historyContainer = document.getElementById('historyContainer');
+    if (!historyContainer) return;
+    
+    historyContainer.innerHTML = transactionHistory.map(transaction => `
+        <div class="transaction-item">
+            <div class="transaction-info">
+                <div class="transaction-type ${transaction.type}">
+                    <i class="fas ${getTransactionIcon(transaction.type)}"></i>
+                    <span>${getTransactionTypeLabel(transaction.type)}</span>
+                </div>
+                <div class="transaction-date">
+                    ${new Date(transaction.date).toLocaleDateString()}
+                </div>
+            </div>
+            <div class="transaction-amount ${transaction.amount > 0 ? 'positive' : 'negative'}">
+                ${transaction.amount > 0 ? '+' : ''}${transaction.amount} ₽
+            </div>
+            <div class="transaction-status ${transaction.status}">
+                ${getTransactionStatusLabel(transaction.status)}
+            </div>
+        </div>
+    `).join('');
+}
+
+// Вспомогательные функции
+function getTransactionIcon(type) {
+    const icons = {
+        deposit: 'fa-plus-circle',
+        withdrawal: 'fa-minus-circle',
+        earning: 'fa-coins',
+        hold: 'fa-clock'
+    };
+    return icons[type] || 'fa-exchange-alt';
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', initApp);
