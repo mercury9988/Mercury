@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель Mercury Bot</title>
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #b967ff;
+            --bg-dark: #0a0a14;
+            --bg-card: #121220;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: sans-serif; background: var(--bg-dark); color: white; padding: 20px; }
+        
+        .admin-container { max-width: 1200px; margin: 0 auto; }
+        .admin-header { margin-bottom: 30px; text-align: center; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        .admin-card {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid var(--neon-purple);
+        }
+        
+        .user-list { max-height: 400px; overflow-y: auto; }
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #333;
+        }
+        
+        input, select, button {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid var(--neon-blue);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Админ-панель Mercury Bot</h1>
+            <input type="password" id="adminPassword" placeholder="Введите пароль">
+            <button onclick="login()">Войти</button>
+        </div>
+        
+        <div id="adminContent" style="display: none;">
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h2>Пользователи</h2>
+                    <div class="user-list" id="userList"></div>
+                </div>
+                
+                <div class="admin-card">
+                    <h2>Пополнение баланса</h2>
+                    <input type="text" id="userId" placeholder="ID пользователя">
+                    <input type="number" id="depositAmount" placeholder="Сумма">
+                    <input type="text" id="depositReason" placeholder="Причина">
+                    <button onclick="depositBalance()">Пополнить</button>
+                </div>
+                
+                <div class="admin-card">
+                    <h2>Заявки на вывод</h2>
+                    <div id="withdrawalRequests"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const ADMIN_PASSWORD = 'mercury2024'; // Измените на свой пароль
+        
+        async function login() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('adminContent').style.display = 'block';
+                loadUsers();
+                loadWithdrawals();
+            } else {
+                alert('Неверный пароль');
+            }
+        }
+        
+        async function loadUsers() {
+            try {
+                const response = await fetch('http://localhost:3000/api/admin/users');
+                const users = await response.json();
+                
+                const userList = document.getElementById('userList');
+                userList.innerHTML = users.map(user => `
+                    <div class="user-item">
+                        <div>
+                            <strong>${user.firstName || 'Неизвестно'} ${user.lastName || ''}</strong><br>
+                            <small>ID: ${user.telegramId}</small>
+                        </div>
+                        <div>
+                            ${user.balance} ₽
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+        
+        async function depositBalance() {
+            const userId = document.getElementById('userId').value;
+            const amount = document.getElementById('depositAmount').value;
+            const reason = document.getElementById('depositReason').value;
+            
+            if (!userId || !amount) {
+                alert('Заполните все поля');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/balance/deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        telegramId: userId,
+                        amount: parseInt(amount),
+                        description: reason
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('Баланс успешно пополнен');
+                    loadUsers();
+                } else {
+                    alert('Ошибка: ' + data.error);
+                }
+            } catch (error) {
+                alert('Ошибка соединения');
+            }
+        }
+    </script>
+</body>
+</html>
