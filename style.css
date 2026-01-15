@@ -938,3 +938,194 @@ body {
         width: 100%;
     }
 }
+
+/* Улучшенные неоновые эффекты */
+.neon-text-blue {
+    color: #00f3ff;
+    text-shadow: 
+        0 0 7px #00f3ff,
+        0 0 10px #00f3ff,
+        0 0 21px #00f3ff,
+        0 0 42px #0ff,
+        0 0 82px #0ff;
+}
+
+.neon-text-purple {
+    color: #b967ff;
+    text-shadow: 
+        0 0 7px #b967ff,
+        0 0 10px #b967ff,
+        0 0 21px #b967ff,
+        0 0 42px #9d4edd,
+        0 0 82px #9d4edd;
+}
+
+.neon-text-pink {
+    color: #ff2a9d;
+    text-shadow: 
+        0 0 7px #ff2a9d,
+        0 0 10px #ff2a9d,
+        0 0 21px #ff2a9d,
+        0 0 42px #ff006e,
+        0 0 82px #ff006e;
+}
+
+.neon-text-cyan {
+    color: #00e5ff;
+    text-shadow: 
+        0 0 7px #00e5ff,
+        0 0 10px #00e5ff,
+        0 0 21px #00e5ff,
+        0 0 42px #00b7d4,
+        0 0 82px #00b7d4;
+}
+
+/* Градиентные фоны */
+.gradient-bg-blue {
+    background: linear-gradient(135deg, 
+        rgba(0, 243, 255, 0.1), 
+        rgba(185, 103, 255, 0.1));
+}
+
+.gradient-bg-pink {
+    background: linear-gradient(135deg, 
+        rgba(255, 42, 157, 0.1), 
+        rgba(255, 222, 0, 0.1));
+}
+
+.gradient-bg-purple {
+    background: linear-gradient(135deg, 
+        rgba(157, 78, 221, 0.1), 
+        rgba(255, 42, 157, 0.1));
+}
+
+/* Анимации */
+@keyframes neon-pulse-blue {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(0, 243, 255, 0.5),
+                    0 0 40px rgba(0, 243, 255, 0.3),
+                    0 0 60px rgba(0, 243, 255, 0.1);
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(0, 243, 255, 0.8),
+                    0 0 50px rgba(0, 243, 255, 0.5),
+                    0 0 70px rgba(0, 243, 255, 0.2);
+    }
+}
+
+@keyframes neon-pulse-purple {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(185, 103, 255, 0.5),
+                    0 0 40px rgba(185, 103, 255, 0.3),
+                    0 0 60px rgba(185, 103, 255, 0.1);
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(185, 103, 255, 0.8),
+                    0 0 50px rgba(185, 103, 255, 0.5),
+                    0 0 70px rgba(185, 103, 255, 0.2);
+    }
+}
+
+@keyframes neon-pulse-pink {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(255, 42, 157, 0.5),
+                    0 0 40px rgba(255, 42, 157, 0.3),
+                    0 0 60px rgba(255, 42, 157, 0.1);
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(255, 42, 157, 0.8),
+                    0 0 50px rgba(255, 42, 157, 0.5),
+                    0 0 70px rgba(255, 42, 157, 0.2);
+    }
+}
+
+/* Применение анимаций к элементам */
+.balance-card.blue-glow {
+    animation: neon-pulse-blue 2s infinite;
+}
+
+.balance-card.purple-glow {
+    animation: neon-pulse-purple 2s infinite alternate;
+}
+
+.feature-item:hover {
+    animation: neon-pulse-blue 1s infinite;
+}
+
+/* Улучшенные кнопки */
+.neon-btn-blue {
+    background: linear-gradient(135deg, #00f3ff, #00a8ff);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+    border: 2px solid #00f3ff;
+}
+
+.neon-btn-purple {
+    background: linear-gradient(135deg, #b967ff, #9d4edd);
+    box-shadow: 0 0 20px rgba(185, 103, 255, 0.4);
+    border: 2px solid #b967ff;
+}
+
+.neon-btn-pink {
+    background: linear-gradient(135deg, #ff2a9d, #ff006e);
+    box-shadow: 0 0 20px rgba(255, 42, 157, 0.4);
+    border: 2px solid #ff2a9d;
+}
+
+/* Эффект при наведении */
+.neon-btn-blue:hover {
+    box-shadow: 0 0 30px rgba(0, 243, 255, 0.8),
+                0 0 50px rgba(0, 243, 255, 0.4);
+    transform: translateY(-3px);
+}
+
+/* Улучшенные карточки */
+.offer-card.enhanced {
+    position: relative;
+    overflow: hidden;
+}
+
+.offer-card.enhanced::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(0, 243, 255, 0.1) 50%,
+        transparent 70%
+    );
+    animation: shine 3s infinite linear;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+/* Дополнительные неоновые элементы */
+.neon-border-bottom {
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(90deg, 
+        #00f3ff, #b967ff, #ff2a9d, #ffde00) 1;
+}
+
+.neon-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 5px;
+    animation: dot-pulse 1.5s infinite;
+}
+
+.neon-dot.blue { background: #00f3ff; }
+.neon-dot.purple { background: #b967ff; animation-delay: 0.3s; }
+.neon-dot.pink { background: #ff2a9d; animation-delay: 0.6s; }
+
+@keyframes dot-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.7; }
+}
