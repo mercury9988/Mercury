@@ -3,429 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mercury Partner</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Mercury Bot - Партнёрская программа</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
 </head>
-<body class="dark-theme">
-    <div class="app-container">
-        <!-- Шапка приложения -->
-        <header class="app-header">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-gem"></i>
-                    </div>
-                    <h1 class="logo-text">Mercury<span>Partner</span></h1>
-                </div>
-                <div class="header-actions">
-                    <button class="theme-toggle" id="themeToggle">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                </div>
+<body>
+    <!-- Боковое меню -->
+    <div class="sidebar">
+        <div class="logo-container">
+            <h1 class="logo-text">MERCURY<span>BOT</span></h1>
+            <div class="theme-switch" id="themeSwitch">
+                <i class="fas fa-moon"></i>
             </div>
-        </header>
+        </div>
+        
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active" data-tab="home">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="earnings">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Заработок</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="support">
+                <i class="fas fa-headset"></i>
+                <span>Поддержка</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="menu">
+                <i class="fas fa-bars"></i>
+                <span>Меню</span>
+            </a>
+        </nav>
+        
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="user-details">
+                <p class="user-id" id="userId">ID: Загрузка...</p>
+                <p class="user-status">Активный партнёр</p>
+            </div>
+        </div>
+    </div>
 
-        <!-- Основной контент -->
-        <main class="main-content">
-            <!-- Вкладка Главная -->
-            <section id="home" class="tab-content active">
-                <div class="balance-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-wallet"></i>
-                        Ваши финансы
-                    </h2>
-                    
-                    <div class="balance-cards">
-                        <div class="balance-card primary">
-                            <div class="balance-icon">
-                                <i class="fas fa-money-bill-wave"></i>
-                            </div>
-                            <div class="balance-info">
-                                <div class="balance-label">Доступный баланс</div>
-                                <div class="balance-amount">0.00 ₽</div>
-                            </div>
-                            <div class="balance-trend">
-                                <i class="fas fa-arrow-up"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="balance-card secondary">
-                            <div class="balance-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="balance-info">
-                                <div class="balance-label">Средства на холде</div>
-                                <div class="balance-amount">0.00 ₽</div>
-                            </div>
-                            <div class="balance-trend">
-                                <i class="fas fa-hourglass-half"></i>
-                            </div>
+    <!-- Основной контент -->
+    <main class="main-content">
+        <!-- Вкладка Главная -->
+        <section id="home" class="tab-content active">
+            <div class="balance-container">
+                <div class="balance-card neon-glow">
+                    <h2>Ваш баланс</h2>
+                    <div class="balance-amount">
+                        <span class="amount" id="balance">1 850 ₽</span>
+                        <div class="hold-balance">
+                            <span>Холд:</span>
+                            <span class="hold-amount" id="holdBalance">750 ₽</span>
                         </div>
                     </div>
-                    
-                    <p class="balance-description">
-                        💰 <strong>Начни зарабатывать прямо сейчас!</strong><br>
-                        Присоединяйся к тысячам партнёров, которые уже получают стабильный доход
-                    </p>
-                    
-                    <button class="action-button start-earning">
-                        <i class="fas fa-rocket"></i>
-                        Перейти к заработку
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
                 </div>
-
-                <div class="offers-preview">
-                    <h2 class="section-title">
-                        <i class="fas fa-star"></i>
-                        Топ предложения
-                    </h2>
-                    
-                    <div class="offers-grid">
-                        <div class="offer-card">
-                            <div class="offer-badge">🔥 ХИТ</div>
+                
+                <div class="warning-banner neon-border">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Оформление услуг только по ссылкам. Не пытайтесь обмануть сайт</p>
+                </div>
+                
+                <button class="primary-btn earn-btn" id="startEarning">
+                    <i class="fas fa-rocket"></i>
+                    Начать зарабатывать
+                </button>
+            </div>
+            
+            <div class="top-offers">
+                <h2><i class="fas fa-crown"></i> ТОП-3 оффера</h2>
+                <div class="offers-grid">
+                    <div class="offer-card neon-card">
+                        <div class="offer-header">
                             <div class="offer-icon">
                                 <i class="fas fa-credit-card"></i>
                             </div>
-                            <div class="offer-content">
-                                <h3>Кредитная карта</h3>
-                                <p class="offer-reward">До 5 000 ₽ за оформление</p>
-                            </div>
+                            <span class="offer-badge">🔥 Топ-1</span>
                         </div>
-                        
-                        <div class="offer-card">
-                            <div class="offer-badge">⚡ БЫСТРО</div>
-                            <div class="offer-icon">
-                                <i class="fas fa-shipping-fast"></i>
-                            </div>
-                            <div class="offer-content">
-                                <h3>Яндекс Еда</h3>
-                                <p class="offer-reward">За каждого курьера</p>
-                            </div>
-                        </div>
-                        
-                        <div class="offer-card">
-                            <div class="offer-badge">💼 ВЫГОДНО</div>
-                            <div class="offer-icon">
-                                <i class="fas fa-briefcase"></i>
-                            </div>
-                            <div class="offer-content">
-                                <h3>Регистрация бизнеса</h3>
-                                <p class="offer-reward">От 3 000 ₽</p>
-                            </div>
-                        </div>
+                        <h3>Тинькофф Платинум</h3>
+                        <p class="offer-reward">+3 500 ₽</p>
+                        <button class="offer-btn">Получить</button>
                     </div>
-                </div>
-
-                <div class="features-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-medal"></i>
-                        Почему выбирают нас
-                    </h2>
                     
-                    <div class="features-grid">
-                        <div class="feature-card">
-                            <div class="feature-icon security">
-                                <i class="fas fa-shield-alt"></i>
+                    <div class="offer-card neon-card">
+                        <div class="offer-header">
+                            <div class="offer-icon">
+                                <i class="fas fa-building"></i>
                             </div>
-                            <h3>🛡️ Безопасность</h3>
-                            <p>Все сделки защищены. Ваши данные в безопасности</p>
+                            <span class="offer-badge">🔥 Топ-2</span>
                         </div>
-                        
-                        <div class="feature-card">
-                            <div class="feature-icon honest">
-                                <i class="fas fa-handshake"></i>
-                            </div>
-                            <h3>🤝 Честная работа</h3>
-                            <p>Прозрачные условия и честные выплаты</p>
-                        </div>
-                        
-                        <div class="feature-card">
-                            <div class="feature-icon support">
-                                <i class="fas fa-headset"></i>
-                            </div>
-                            <h3>👨‍💼 Отзывчивая поддержка</h3>
-                            <p>Помогаем 24/7. Отвечаем в течение 5 минут</p>
-                        </div>
-                        
-                        <div class="feature-card">
-                            <div class="feature-icon payments">
-                                <i class="fas fa-bolt"></i>
-                            </div>
-                            <h3>⚡ Быстрые выплаты</h3>
-                            <p>Вывод средств от 500 ₽ в течение 24 часов</p>
-                        </div>
+                        <h3>Открытие ИП</h3>
+                        <p class="offer-reward">+8 000 ₽</p>
+                        <button class="offer-btn">Получить</button>
                     </div>
-                </div>
-            </section>
-
-            <!-- Вкладка Заработок -->
-            <section id="earnings" class="tab-content">
-                <div class="page-header">
-                    <h2 class="page-title">
-                        <i class="fas fa-coins"></i>
-                        Доступные предложения
-                    </h2>
-                    <p class="page-subtitle">Выберите категорию и начните зарабатывать</p>
-                </div>
-
-                <div class="categories-section">
-                    <!-- Дебетовые карты -->
-                    <div class="category-block">
-                        <div class="category-header">
-                            <div class="category-title">
-                                <div class="category-icon">
-                                    <i class="fas fa-credit-card"></i>
-                                </div>
-                                <div>
-                                    <h3>💳 Дебетовые карты</h3>
-                                    <div class="category-stats">
-                                        <span class="stat-item">
-                                            <i class="fas fa-gift"></i>
-                                            15 предложений
-                                        </span>
-                                        <span class="stat-item">
-                                            <i class="fas fa-money-bill-wave"></i>
-                                            До 4 500 ₽
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="category-offers">
-                            <div class="offer-item">
-                                <div class="offer-main">
-                                    <div class="offer-name">Карта "Мир Премиум"</div>
-                                    <div class="offer-description">Кэшбэк до 10%, бесплатное обслуживание</div>
-                                </div>
-                                <div class="offer-reward">+1 200 ₽</div>
-                            </div>
-                            
-                            <div class="offer-item">
-                                <div class="offer-main">
-                                    <div class="offer-name">Tinkoff Black</div>
-                                    <div class="offer-description">Премиальная карта с инвестициями</div>
-                                </div>
-                                <div class="offer-reward">+2 500 ₽</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Кредитные карты -->
-                    <div class="category-block">
-                        <div class="category-header">
-                            <div class="category-title">
-                                <div class="category-icon">
-                                    <i class="fas fa-money-check-alt"></i>
-                                </div>
-                                <div>
-                                    <h3>💸 Кредитные карты</h3>
-                                    <div class="category-stats">
-                                        <span class="stat-item">
-                                            <i class="fas fa-gift"></i>
-                                            12 предложений
-                                        </span>
-                                        <span class="stat-item">
-                                            <i class="fas fa-money-bill-wave"></i>
-                                            До 8 700 ₽
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="category-offers">
-                            <div class="offer-item">
-                                <div class="offer-main">
-                                    <div class="offer-name">Альфа-Банк "100 дней"</div>
-                                    <div class="offer-description">0% на всё первые 100 дней</div>
-                                </div>
-                                <div class="offer-reward">+3 000 ₽</div>
-                            </div>
-                            
-                            <div class="offer-item">
-                                <div class="offer-main">
-                                    <div class="offer-name">Сбербанк Кредитная</div>
-                                    <div class="offer-description">Льготный период 120 дней</div>
-                                </div>
-                                <div class="offer-reward">+2 800 ₽</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Регистрация бизнеса + РКО -->
-                    <div class="category-block">
-                        <div class="category-header">
-                            <div class="category-title">
-                                <div class="category-icon">
-                                    <i class="fas fa-briefcase"></i>
-                                </div>
-                                <div>
-                                    <h3>🏢 Регистрация бизнеса + РКО счета</h3>
-                                    <div class="category-stats">
-                                        <span class="stat-item">
-                                            <i class="fas fa-gift"></i>
-                                            8 предложений
-                                        </span>
-                                        <span class="stat-item">
-                                            <i class="fas fa-money-bill-wave"></i>
-                                            До 15 000 ₽
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="category-offers">
-                            <div class="offer-item">
-                                <div class="offer-main">
-                                    <div class="offer-name">ИП + Тинькофф Бизнес</div>
-                                    <div class="offer-description">Полная регистрация за 3 дня</div>
-                                </div>
-                                <div class="offer-reward">+5 000 ₽</div>
-                            </div>
-                            
-                            <div class="offer-item">
-                                <div class="offer-main">
-                                    <div class="offer-name">ООО + Модульбанк</div>
-                                    <div class="offer-description">С нуля за неделю</div>
-                                </div>
-                                <div class="offer-reward">+8 000 ₽</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Микрозаймы -->
-                    <div class="category-block">
-                        <div class="category-header">
-                            <div class="category-title">
-                                <div class="category-icon">
-                                    <i class="fas fa-hand-holding-usd"></i>
-                                </div>
-                                <div>
-                                    <h3>📈 Микрозаймы</h3>
-                                    <div class="category-stats">
-                                        <span class="stat-item">
-                                            <i class="fas fa-gift"></i>
-                                            20 предложений
-                                        </span>
-                                        <span class="stat-item">
-                                            <i class="fas fa-money-bill-wave"></i>
-                                            До 2 500 ₽
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="category-offers">
-                            <div class="offer-item">
-                                <div class="offer-main">
-                                    <div class="offer-name">Деньги сразу</div>
-                                    <div class="offer-description">Первый займ под 0%</div>
-                                </div>
-                                <div class="offer-reward">+800 ₽</div>
-                            </div>
-                            
-                            <div class="offer-item">
-                                <div class="offer-main">
-                                    <div class="offer-name">СМС Финанс</div>
-                                    <div class="offer-description">Одобрение 95% заявок</div>
-                                </div>
-                                <div class="offer-reward">+750 ₽</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Яндекс Еда -->
-                    <div class="category-block">
-                        <div class="category-header">
-                            <div class="category-title">
-                                <div class="category-icon">
-                                    <i class="fas fa-motorcycle"></i>
-                                </div>
-                                <div>
-                                    <h3>🍕 Яндекс Еда (Трудоустройство курьеров)</h3>
-                                    <div class="category-stats">
-                                        <span class="stat-item">
-                                            <i class="fas fa-gift"></i>
-                                            1 предложение
-                                        </span>
-                                        <span class="stat-item">
-                                            <i class="fas fa-money-bill-wave"></i>
-                                            До 3 000 ₽
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="category-offers">
-                            <div class="offer-item">
-                                <div class="offer-main">
-                                    <div class="offer-name">Курьер Яндекс Еда</div>
-                                    <div class="offer-description">Работа в удобное время, гибкий график</div>
-                                </div>
-                                <div class="offer-reward">+1 500 ₽ за человека</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="earnings-info">
-                    <div class="info-card">
-                        <i class="fas fa-info-circle"></i>
-                        <p>💡 <strong>Совет:</strong> Наибольший доход приносят предложения по регистрации бизнеса и кредитные карты</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Вкладка Поддержка -->
-            <section id="support" class="tab-content">
-                <div class="page-header">
-                    <h2 class="page-title">
-                        <i class="fas fa-headset"></i>
-                        Поддержка
-                    </h2>
-                    <p class="page-subtitle">Мы всегда готовы помочь вам</p>
-                </div>
-
-                <div class="support-actions">
-                    <button class="support-btn faq-btn">
-                        <div class="btn-icon">
-                            <i class="fas fa-question-circle"></i>
-                        </div>
-                        <div class="btn-content">
-                            <h3>❓ FAQ</h3>
-                            <p>Ответы на часто задаваемые вопросы</p>
-                        </div>
-                        <div class="btn-arrow">
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </button>
                     
-                    <button class="support-btn contact-btn">
-                        <div class="btn-icon">
-                            <i class="fas fa-comments"></i>
+                    <div class="offer-card neon-card">
+                        <div class="offer-header">
+                            <div class="offer-icon">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <span class="offer-badge">🔥 Топ-3</span>
                         </div>
-                        <div class="btn-content">
-                            <h3>💬 Техническая поддержка</h3>
-                            <p>Напишите нам, если у вас есть вопросы</p>
-                        </div>
-                        <div class="btn-arrow">
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </button>
+                        <h3>Микрозайм Webbankir</h3>
+                        <p class="offer-reward">+1 800 ₽</p>
+                        <button class="offer-btn">Получить</button>
+                    </div>
                 </div>
+            </div>
+            
+            <div class="features-section">
+                <h2><i class="fas fa-star"></i> Почему выбирают нас</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon security">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Безопасность</h3>
+                        <p>Защищённые транзакции и конфиденциальность данных</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon honesty">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3>Честная работа</h3>
+                        <p>Прозрачные условия и честные выплаты</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon support">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h3>Отзывчивая поддержка</h3>
+                        <p>Помощь 24/7 по любым вопросам</p>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon payment">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3>Быстрые выплаты</h3>
+                        <p>Вывод средств в течение 24 часов</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
+        <!-- Вкладка Заработок -->
+        <section id="earnings" class="tab-content">
+            <h2 class="section-title"><i class="fas fa-money-bill-wave"></i> Категории заработка</h2>
+            
+            <div class="earnings-categories">
+                <!-- Дебетовые карты -->
+                <div class="category-card neon-card">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="category-info">
+                            <h3>Дебетовые карты</h3>
+                            <p class="category-stats">12 предложений • до 4.500 ₽</p>
+                        </div>
+                    </div>
+                    <div class="category-offers">
+                        <div class="offer-line">
+                            <span>Альфа-Банк Premium</span>
+                            <span class="offer-price">+1 200 ₽</span>
+                        </div>
+                        <div class="offer-line">
+                            <span>Тинькофф Black</span>
+                            <span class="offer-price">+1 500 ₽</span>
+                        </div>
+                        <div class="offer-line">
+                            <span>Сбербанк Premier</span>
+                            <span class="offer-price">+1 000 ₽</span>
+                        </div>
+                    </div>
+                    <button class="category-btn">Смотреть все</button>
+                </div>
+                
+                <!-- Кредитные карты -->
+                <div class="category-card neon-card">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <div class="category-info">
+                            <h3>Кредитные карты</h3>
+                            <p class="category-stats">8 предложений • до 8.700 ₽</p>
+                        </div>
+                    </div>
+                    <div class="category-offers">
+                        <div class="offer-line">
+                            <span>Тинькофф Платинум</span>
+                            <span class="offer-price">+3 500 ₽</span>
+                        </div>
+                        <div class="offer-line">
+                            <span>Альфа-Банк Кредитная</span>
+                            <span class="offer-price">+2 800 ₽</span>
+                        </div>
+                        <div class="offer-line">
+                            <span>ВТБ Кредитная карта</span>
+                            <span class="offer-price">+2 100 ₽</span>
+                        </div>
+                    </div>
+                    <button class="category-btn">Смотреть все</button>
+                </div>
+                
+                <!-- Регистрация бизнеса -->
+                <div class="category-card neon-card">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="category-info">
+                            <h3>Бизнес + РКО счета</h3>
+                            <p class="category-stats">6 предложений • до 15.000 ₽</p>
+                        </div>
+                    </div>
+                    <div class="category-offers">
+                        <div class="offer-line">
+                            <span>Открытие ИП</span>
+                            <span class="offer-price">+8 000 ₽</span>
+                        </div>
+                        <div class="offer-line">
+                            <span>РКО Тинькофф</span>
+                            <span class="offer-price">+5 000 ₽</span>
+                        </div>
+                        <div class="offer-line">
+                            <span>РКО Модульбанк</span>
+                            <span class="offer-price">+4 500 ₽</span>
+                        </div>
+                    </div>
+                    <button class="category-btn">Смотреть все</button>
+                </div>
+                
+                <!-- Микрозаймы -->
+                <div class="category-card neon-card">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="category-info">
+                            <h3>Микрозаймы</h3>
+                            <p class="category-stats">15 предложений • до 2.500 ₽</p>
+                        </div>
+                    </div>
+                    <div class="category-offers">
+                        <div class="offer-line">
+                            <span>Webbankir</span>
+                            <span class="offer-price">+1 800 ₽</span>
+                        </div>
+                        <div class="offer-line">
+                            <span>MoneyMan</span>
+                            <span class="offer-price">+1 500 ₽</span>
+                        </div>
+                        <div class="offer-line">
+                            <span>Займер</span>
+                            <span class="offer-price">+1 200 ₽</span>
+                        </div>
+                    </div>
+                    <button class="category-btn">Смотреть все</button>
+                </div>
+                
+                <!-- Яндекс Еда -->
+                <div class="category-card neon-card">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-motorcycle"></i>
+                        </div>
+                        <div class="category-info">
+                            <h3>Яндекс Еда - курьеры</h3>
+                            <p class="category-stats">Безлимит • 1.500 ₽/чел</p>
+                        </div>
+                    </div>
+                    <div class="category-offers">
+                        <div class="offer-line">
+                            <span>Курьер пеший</span>
+                            <span class="offer-price">+1 500 ₽</span>
+                        </div>
+                        <div class="offer-line">
+                            <span>Курьер на авто</span>
+                            <span class="offer-price">+1 500 ₽</span>
+                        </div>
+                        <div class="offer-line">
+                            <span>Курьер на велосипеде</span>
+                            <span class="offer-price">+1 500 ₽</span>
+                        </div>
+                    </div>
+                    <button class="category-btn">Смотреть все</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Вкладка Поддержка -->
+        <section id="support" class="tab-content">
+            <h2 class="section-title"><i class="fas fa-headset"></i> Поддержка</h2>
+            
+            <div class="support-container">
+                <a href="https://t.me/mercury_support" class="support-btn primary-btn" target="_blank">
+                    <i class="fas fa-comment-dots"></i>
+                    Техническая поддержка
+                </a>
+                
                 <div class="faq-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-list"></i>
-                        Частые вопросы
-                    </h3>
+                    <h3>Частые вопросы</h3>
                     
                     <div class="faq-container">
                         <div class="faq-item">
@@ -434,27 +322,27 @@
                                 <i class="fas fa-chevron-down"></i>
                             </div>
                             <div class="faq-answer">
-                                <p>Выплаты доступны от 500 ₽. Перейдите в раздел "Меню" → нажмите "Заказать выплату". Средства придут в течение 24 часов.</p>
+                                <p>Выплаты осуществляются автоматически при достижении минимальной суммы 500 ₽. Заявка на вывод создается в разделе "Меню" → "Заказать выплату".</p>
                             </div>
                         </div>
                         
                         <div class="faq-item">
                             <div class="faq-question">
-                                <span>Как отслеживать мои заявки?</span>
+                                <span>Как отслеживать заявки?</span>
                                 <i class="fas fa-chevron-down"></i>
                             </div>
                             <div class="faq-answer">
-                                <p>Все ваши заявки автоматически отслеживаются. Статус можно увидеть в разделе "Меню" → "История операций".</p>
+                                <p>Все заявки отображаются в разделе "Меню" → "История операций". Статусы: "В обработке", "Одобрено", "Выплачено".</p>
                             </div>
                         </div>
                         
                         <div class="faq-item">
                             <div class="faq-question">
-                                <span>Сколько времени занимает подтверждение заявки?</span>
+                                <span>Время подтверждения заявок?</span>
                                 <i class="fas fa-chevron-down"></i>
                             </div>
                             <div class="faq-answer">
-                                <p>Обычно от 1 до 3 рабочих дней. Некоторые банки подтверждают быстрее — в течение нескольких часов.</p>
+                                <p>Заявки на финансовые продукты подтверждаются в течение 24-72 часов. После подтверждения выплата начисляется на баланс.</p>
                             </div>
                         </div>
                         
@@ -464,222 +352,167 @@
                                 <i class="fas fa-chevron-down"></i>
                             </div>
                             <div class="faq-answer">
-                                <p>Используйте реферальную ссылку в разделе "Меню". Вы будете получать 10% от дохода приглашённых.</p>
+                                <p>В разделе "Меню" → "Реферальная программа" вы найдете вашу реферальную ссылку. За каждого приглашенного друга вы получаете 10% от его заработка.</p>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                <div class="contact-info">
-                    <div class="info-card">
-                        <i class="fas fa-clock"></i>
-                        <p><strong>⏰ Время работы поддержки:</strong> Круглосуточно, 7 дней в неделю</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Вкладка Меню -->
-            <section id="menu" class="tab-content">
-                <div class="page-header">
-                    <h2 class="page-title">
+        <!-- Вкладка Меню -->
+        <section id="menu" class="tab-content">
+            <div class="profile-card neon-glow">
+                <div class="profile-header">
+                    <div class="profile-avatar">
                         <i class="fas fa-user-circle"></i>
-                        Мой профиль
-                    </h2>
+                    </div>
+                    <div class="profile-info">
+                        <h3 id="menuUserId">ID: Загрузка...</h3>
+                        <p class="profile-status">Партнёр Mercury</p>
+                    </div>
                 </div>
-
-                <div class="profile-section">
-                    <div class="profile-card">
-                        <div class="profile-header">
-                            <div class="profile-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="profile-info">
-                                <h3>Mercury User</h3>
-                                <p class="profile-id">
-                                    <i class="fas fa-id-card"></i>
-                                    ID: <span id="userId">123456789</span>
-                                </p>
-                                <p class="profile-role">
-                                    <i class="fas fa-star"></i>
-                                    Статус: <span>Партнёр</span>
-                                </p>
-                            </div>
-                        </div>
+                
+                <div class="profile-balance">
+                    <div class="balance-item">
+                        <span>Доступно:</span>
+                        <span class="balance-amount" id="menuBalance">1 850 ₽</span>
                     </div>
-
-                    <div class="balance-section menu-balance">
-                        <h3 class="section-title">
-                            <i class="fas fa-chart-line"></i>
-                            Финансовая статистика
-                        </h3>
-                        
-                        <div class="balance-cards">
-                            <div class="balance-card mini">
-                                <div class="balance-label">Доступно</div>
-                                <div class="balance-amount">0.00 ₽</div>
-                                <div class="balance-sub">Баланс</div>
-                            </div>
-                            
-                            <div class="balance-card mini">
-                                <div class="balance-label">На холде</div>
-                                <div class="balance-amount">0.00 ₽</div>
-                                <div class="balance-sub">Ожидает</div>
-                            </div>
-                            
-                            <div class="balance-card mini">
-                                <div class="balance-label">Всего</div>
-                                <div class="balance-amount">0.00 ₽</div>
-                                <div class="balance-sub">Заработано</div>
-                            </div>
-                        </div>
-                        
-                        <button class="withdraw-btn">
-                            <i class="fas fa-money-check-alt"></i>
-                            Заказать выплату
-                        </button>
+                    <div class="balance-item">
+                        <span>В холде:</span>
+                        <span class="hold-amount" id="menuHold">750 ₽</span>
                     </div>
-
-                    <div class="menu-options">
-                        <h3 class="section-title">
-                            <i class="fas fa-cog"></i>
-                            Настройки
-                        </h3>
-                        
-                        <div class="options-list">
-                            <div class="menu-item" id="themeSelector">
-                                <div class="menu-icon">
+                </div>
+            </div>
+            
+            <div class="menu-sections">
+                <div class="menu-section">
+                    <h3><i class="fas fa-cog"></i> Настройки</h3>
+                    <div class="menu-list">
+                        <div class="menu-item" id="toggleTheme">
+                            <div class="menu-item-content">
+                                <div class="menu-icon theme">
                                     <i class="fas fa-palette"></i>
                                 </div>
-                                <div class="menu-text">
-                                    <h4>🎨 Тема сайта</h4>
-                                    <p>Светлая или тёмная тема</p>
-                                </div>
-                                <div class="menu-control">
-                                    <div class="theme-selector">
-                                        <span class="theme-option active" data-theme="dark">Тёмная</span>
-                                        <span class="theme-option" data-theme="light">Светлая</span>
-                                    </div>
-                                </div>
+                                <span>Тема сайта</span>
                             </div>
-                            
-                            <div class="menu-item">
+                            <div class="theme-toggle">
+                                <span>Тёмная</span>
+                                <div class="toggle-switch">
+                                    <div class="toggle-circle"></div>
+                                </div>
+                                <span>Светлая</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-section">
+                    <h3><i class="fas fa-history"></i> Активность</h3>
+                    <div class="menu-list">
+                        <a href="#" class="menu-item" id="historyBtn">
+                            <div class="menu-item-content">
                                 <div class="menu-icon">
-                                    <i class="fas fa-history"></i>
+                                    <i class="fas fa-chart-line"></i>
                                 </div>
-                                <div class="menu-text">
-                                    <h4>📊 История операций</h4>
-                                    <p>Все ваши транзакции и заявки</p>
-                                </div>
-                                <div class="menu-arrow">
-                                    <i class="fas fa-chevron-right"></i>
-                                </div>
+                                <span>История операций</span>
                             </div>
-                            
-                            <div class="menu-item">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        
+                        <a href="#" class="menu-item" id="reviewsBtn">
+                            <div class="menu-item-content">
                                 <div class="menu-icon">
                                     <i class="fas fa-star"></i>
                                 </div>
-                                <div class="menu-text">
-                                    <h4>⭐ Отзывы</h4>
-                                    <p>Что говорят наши партнёры</p>
-                                </div>
-                                <div class="menu-arrow">
-                                    <i class="fas fa-chevron-right"></i>
-                                </div>
+                                <span>Отзывы</span>
                             </div>
-                            
-                            <div class="menu-item">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        
+                        <a href="#" class="menu-item" id="referralBtn">
+                            <div class="menu-item-content">
                                 <div class="menu-icon">
-                                    <i class="fas fa-share-alt"></i>
+                                    <i class="fas fa-users"></i>
                                 </div>
-                                <div class="menu-text">
-                                    <h4>🤝 Реферальная программа</h4>
-                                    <p>Приглашайте друзей и получайте бонусы</p>
-                                </div>
-                                <div class="menu-arrow">
-                                    <i class="fas fa-chevron-right"></i>
-                                </div>
+                                <span>Реферальная программа</span>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="reviews-preview">
-                        <h3 class="section-title">
-                            <i class="fas fa-comment-dots"></i>
-                            Отзывы партнёров
-                        </h3>
-                        
-                        <div class="reviews-list">
-                            <div class="review-card">
-                                <div class="review-header">
-                                    <div class="review-author">Алексей К.</div>
-                                    <div class="review-rating">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                    </div>
-                                </div>
-                                <div class="review-text">
-                                    "За месяц заработал 25 000 ₽. Все выплаты вовремя, поддержка всегда на связи!"
-                                </div>
-                            </div>
-                            
-                            <div class="review-card">
-                                <div class="review-header">
-                                    <div class="review-author">Мария С.</div>
-                                    <div class="review-rating">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                    </div>
-                                </div>
-                                <div class="review-text">
-                                    "Отличная платформа! Особенно нравятся предложения по регистрации бизнеса."
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <button class="view-all-reviews">
-                            <i class="fas fa-eye"></i>
-                            Посмотреть все отзывы
-                        </button>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
                     </div>
                 </div>
-            </section>
-        </main>
+                
+                <div class="menu-section">
+                    <h3><i class="fas fa-wallet"></i> Финансы</h3>
+                    <div class="menu-list">
+                        <button class="payout-btn primary-btn" id="requestPayout">
+                            <i class="fas fa-credit-card"></i>
+                            Заказать выплату
+                        </button>
+                        <p class="payout-note">Минимальная сумма вывода: 500 ₽</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
-        <!-- Нижняя навигация -->
-        <nav class="bottom-navigation">
-            <button class="nav-item active" data-tab="home">
-                <i class="fas fa-home"></i>
-                <span>Главная</span>
-            </button>
-            
-            <button class="nav-item" data-tab="earnings">
-                <i class="fas fa-coins"></i>
-                <span>Заработок</span>
-            </button>
-            
-            <button class="nav-item" data-tab="support">
-                <i class="fas fa-headset"></i>
-                <span>Поддержка</span>
-            </button>
-            
-            <button class="nav-item" data-tab="menu">
-                <i class="fas fa-bars"></i>
-                <span>Меню</span>
-            </button>
-        </nav>
+    <!-- Модальные окна -->
+    <div class="modal" id="offerModal">
+        <div class="modal-content neon-card">
+            <div class="modal-header">
+                <h3 id="modalTitle">Оффер</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modalDescription">Описание оффера</p>
+                <div class="modal-reward">
+                    <span>Вознаграждение:</span>
+                    <span id="modalReward">0 ₽</span>
+                </div>
+                <div class="modal-instructions">
+                    <h4>Инструкция:</h4>
+                    <ol>
+                        <li>Нажмите "Перейти к офферу"</li>
+                        <li>Заполните заявку полностью</li>
+                        <li>Ожидайте подтверждения (24-72 часа)</li>
+                        <li>Получите вознаграждение на баланс</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-btn close-modal">Отмена</button>
+                <button class="primary-btn" id="goToOffer">Перейти к офферу</button>
+            </div>
+        </div>
+    </div>
 
-        <!-- Уведомления -->
-        <div class="notification" id="notification">
-            <div class="notification-content">
-                <i class="fas fa-check-circle"></i>
-                <span id="notification-text">Уведомление</span>
+    <div class="modal" id="payoutModal">
+        <div class="modal-content neon-card">
+            <div class="modal-header">
+                <h3>Заказ выплаты</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="payout-info">
+                    <p>Доступно для вывода: <strong id="availablePayout">1 850 ₽</strong></p>
+                    <div class="input-group">
+                        <label for="payoutAmount">Сумма вывода (₽):</label>
+                        <input type="number" id="payoutAmount" min="500" max="1850" value="500">
+                    </div>
+                    <div class="input-group">
+                        <label for="payoutMethod">Способ получения:</label>
+                        <select id="payoutMethod">
+                            <option value="card">Банковская карта</option>
+                            <option value="qiwi">QIWI Кошелёк</option>
+                            <option value="yoomoney">ЮMoney</option>
+                        </select>
+                    </div>
+                    <p class="payout-note">Выплаты обрабатываются в течение 24 часов</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-btn close-modal">Отмена</button>
+                <button class="primary-btn" id="confirmPayout">Заказать выплату</button>
             </div>
         </div>
     </div>
